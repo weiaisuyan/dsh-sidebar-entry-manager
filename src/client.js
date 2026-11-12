@@ -620,6 +620,7 @@ function EntrySection(props) {
     progress: null,
     agentsBusy: 0,
     forceFresh: false,
+    market: true,
   })
   const autoRef = React.useRef(false)
 
@@ -662,15 +663,18 @@ function EntrySection(props) {
       }
       setUpdate({
         phase: available ? 'available' : 'latest',
-        text: available
-          ? t('available', { latest })
-          : t('latest', { time: stamp() }),
+        text: !available
+          ? t('latest', { time: stamp() })
+          : hasMarket === true
+            ? t('available', { latest })
+            : t('noMarket') + ` v${latest}`,
         installed,
         latest,
-        canUpdate: available,
+        canUpdate: available && hasMarket === true,
         progress: null,
         agentsBusy: 0,
         forceFresh: false,
+        market: hasMarket === true,
       })
       if (available === true && quiet === true && state.autoUpdate === true && autoRef.current === false) {
         autoRef.current = true
@@ -689,6 +693,10 @@ function EntrySection(props) {
   }
 
   const runUpdate = async (targetVersion) => {
+    if (update.market === false) {
+      setUpdate((prev) => ({ ...prev, text: t('noMarket'), canUpdate: false }))
+      return
+    }
     const target = typeof targetVersion === 'string' && targetVersion !== '' ? targetVersion : update.latest
     setUpdate((prev) => ({ ...prev, phase: 'updating', text: t('updating', { progress: '' }), canUpdate: false, progress: 0 }))
     try {
