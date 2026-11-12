@@ -1,0 +1,62 @@
+{
+  "name": "dsh-sidebar-entries",
+  "version": "0.2.0",
+  "description": "Manage which plugin entries appear in the DeepSeek Harness left sidebar: hide or show any sidebar panel row without disabling the plugin.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.1-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "deepseek",
+    "sidebar",
+    "sidebar-entries",
+    "ui"
+  ],
+  "author": {
+    "name": "weiaisuyan",
+    "url": "https://github.com/weiaisuyan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weiaisuyan/dsh-sidebar-entries.git"
+  },
+  "homepage": "https://github.com/weiaisuyan/dsh-sidebar-entries#readme",
+  "bugs": {
+    "url": "https://github.com/weiaisuyan/dsh-sidebar-entries/issues"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test",
+    "check": "node --check src/host.js && node --check src/client.js && node --check scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "license": "MIT"
+}
