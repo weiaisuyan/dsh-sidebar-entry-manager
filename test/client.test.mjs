@@ -67,7 +67,7 @@ async function loadClient() {
   vm.createContext(sandbox)
   vm.runInContext(source, sandbox, { filename: 'lib/client.js' })
   assert.ok(captured !== undefined, 'the bundle must call __ModuleLoader__.load')
-  assert.equal(captured.id, 'dsh-sidebar-entries')
+  assert.equal(captured.id, 'dsh-sidebar-entry-manager')
   const exports = captured.factory((name) => {
     if (name === 'react') return makeReact()
     throw new Error(`unexpected require(${name})`)
@@ -241,7 +241,7 @@ test('apply mounts, syncs the DOM and registers the Settings section', async () 
   exports.apply(ctx)
   assert.equal(registered.length, 1)
   assert.equal(registered[0].options.name, 'settings.section')
-  assert.equal(registered[0].options.id, 'sidebar-entries')
+  assert.equal(registered[0].options.id, 'sidebar-entry-manager')
 
   // Drive the section through one render and two toggles.
   const committed = []

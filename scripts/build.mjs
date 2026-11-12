@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build dsh-sidebar-entries.
+ * Build dsh-sidebar-entry-manager.
  *
  * The DSH web client does not load plain ES modules for a plugin's browser
  * half: it evaluates `lib/client.js` as a script whose only entry point is
@@ -17,7 +17,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
-const PACKAGE_NAME = 'dsh-sidebar-entries'
+const PACKAGE_NAME = 'dsh-sidebar-entry-manager'
 
 /** Indent every non-empty line by two tabs to match the shipped bundle shape. */
 function indent(source) {

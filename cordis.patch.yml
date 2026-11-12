@@ -1,4 +1,4 @@
 # Insert the entry manager into the DSH web profile roster.
 - insert:
-    - id: ui-sidebar-entries
-      name: 'dsh-sidebar-entries'
+    - id: ui-sidebar-entry-manager
+      name: 'dsh-sidebar-entry-manager'

@@ -12,4 +12,4 @@
 
 - 首个版本：设置 → 侧边栏入口，逐项隐藏/显示左侧导航栏的插件入口。
 - 只改导航行绘制（`display:none`），插件继续运行。
-- Host 状态文件 `~/.dsh/sidebar-entries.json`，跨端口、重启、浏览器保持。
+- Host 状态文件 `~/.dsh/sidebar-entry-manager.json`，跨端口、重启、浏览器保持。

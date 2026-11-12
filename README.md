@@ -1,4 +1,4 @@
-# dsh-sidebar-entries
+# dsh-sidebar-entry-manager
 
 A visibility switch for the plugin entries in the DeepSeek Harness left sidebar.
 
@@ -16,7 +16,7 @@ The page lists whatever is actually registered right now (install another plugin
 - on → it comes straight back;
 - "Show everything again" resets the list.
 
-The choice lives on the Host (`~/.dsh/sidebar-entries.json`), so it survives a port change, a restart, and a different browser.
+The choice lives on the Host (`~/.dsh/sidebar-entry-manager.json`), so it survives a port change, a restart, and a different browser.
 
 ## Plugin updates (v0.2.0)
 
@@ -47,7 +47,7 @@ The `plugins` entry (the plugin manager) can be hidden too, but then the sidebar
 ## Install
 
 ```powershell
-dsh plugin --profile desktop add "<absolute path>\dsh-sidebar-entries-0.2.0.tgz"
+dsh plugin --profile desktop add "<absolute path>\dsh-sidebar-entry-manager-0.2.0.tgz"
 ```
 
 Or paste the package name into **Plugins → Add plugin** once it is on npm.
@@ -59,7 +59,7 @@ node scripts/build.mjs   # src/ → lib/ (browser half wrapped in the __ModuleLo
 node --test              # 25 cases, zero dependencies
 ```
 
-- `src/host.js` → `lib/index.js`: the state file (`hidden` + `autoUpdate`) plus one fenced `/api/dsh-sidebar-entries/state` route (GET reads, POST writes).
+- `src/host.js` → `lib/index.js`: the state file (`hidden` + `autoUpdate`) plus one fenced `/api/dsh-sidebar-entry-manager/state` route (GET reads, POST writes).
 - `src/client.js` → `lib/client.js`: DOM visibility, the `settings.section` page, and the update panel.
 
 ## License

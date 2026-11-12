@@ -1,4 +1,4 @@
-# dsh-sidebar-entries
+# dsh-sidebar-entry-manager
 
 给 DSH 左侧导航栏的插件入口加一个开关。
 
@@ -16,7 +16,7 @@ DSH 的侧栏外壳只负责把 `sidebar.panellist` 里的注册项画成一行�
 - 打开 → 立刻回来；
 - 「全部恢复显示」一键还原。
 
-选择保存在 Host 上（`~/.dsh/sidebar-entries.json`），换端口、重启 DSH、换浏览器都还在。
+选择保存在 Host 上（`~/.dsh/sidebar-entry-manager.json`），换端口、重启 DSH、换浏览器都还在。
 
 ## 插件更新（v0.2.0）
 
@@ -48,7 +48,7 @@ DSH 的侧栏外壳只负责把 `sidebar.panellist` 里的注册项画成一行�
 
 ```powershell
 # 本地 tarball
-dsh plugin --profile desktop add "<绝对路径>\dsh-sidebar-entries-0.2.0.tgz"
+dsh plugin --profile desktop add "<绝对路径>\dsh-sidebar-entry-manager-0.2.0.tgz"
 ```
 
 也可以在 **插件 → 添加插件** 里填包名（发布到 npm 之后）。
@@ -60,7 +60,7 @@ node scripts/build.mjs   # src/ → lib/（浏览器半侧包一层 __ModuleLoad
 node --test              # 25 个用例，零依赖
 ```
 
-- `src/host.js` → `lib/index.js`：状态文件（`hidden` + `autoUpdate`）+ 一条受信任围栏保护的 `/api/dsh-sidebar-entries/state` 路由（GET 读 / POST 写）。
+- `src/host.js` → `lib/index.js`：状态文件（`hidden` + `autoUpdate`）+ 一条受信任围栏保护的 `/api/dsh-sidebar-entry-manager/state` 路由（GET 读 / POST 写）。
 - `src/client.js` → `lib/client.js`：DOM 显隐 + 设置页分区（`settings.section`）+ 更新面板。
 
 ## 许可

@@ -1,5 +1,5 @@
 /**
- * dsh-sidebar-entries — host half.
+ * dsh-sidebar-entry-manager — host half.
  *
  * Owns exactly one thing: the persisted list of sidebar entry ids the user has
  * hidden, exposed to the browser half over a fenced, loopback-only route pair.
@@ -10,7 +10,7 @@
  * by every browser pointed at this Host.
  *
  * The file is plain JSON so it can be inspected, backed up or repaired by hand:
- *   ~/.dsh/sidebar-entries.json   (override: DSH_SIDEBAR_ENTRIES_FILE)
+ *   ~/.dsh/sidebar-entry-manager.json   (override: DSH_SIDEBAR_ENTRIES_FILE)
  *
  * Nothing here renders. All visibility work happens in `lib/client.js`.
  */
@@ -21,11 +21,11 @@ import { dirname, join } from 'node:path'
 
 /** Route family served to the browser half (absolute; the client uses document-relative URLs). */
 export const ROUTES = {
-  state: '/api/dsh-sidebar-entries/state',
+  state: '/api/dsh-sidebar-entry-manager/state',
 }
 
 /** Loader slug reported to the Host. */
-export const name = 'sidebar-entries'
+export const name = 'sidebar-entry-manager'
 
 /** Largest accepted request body (the payload is a short id list). */
 const MAX_BODY_BYTES = 64 * 1024
@@ -46,7 +46,7 @@ export const inject = ['webServer']
 export function stateFile() {
   const override = process.env.DSH_SIDEBAR_ENTRIES_FILE
   if (typeof override === 'string' && override.trim() !== '') return override.trim()
-  return join(homedir(), '.dsh', 'sidebar-entries.json')
+  return join(homedir(), '.dsh', 'sidebar-entry-manager.json')
 }
 
 /**
@@ -283,6 +283,6 @@ export function apply(ctx) {
         path: ROUTES.state,
         handler: (req, res) => handleState(ctx, req, res),
       }),
-    'dsh-sidebar-entries: state route',
+    'dsh-sidebar-entry-manager: state route',
   )
 }

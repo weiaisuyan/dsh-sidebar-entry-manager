@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { after, beforeEach, test } from 'node:test'
 
-const dir = await mkdtemp(join(tmpdir(), 'dsh-sidebar-entries-'))
+const dir = await mkdtemp(join(tmpdir(), 'dsh-sidebar-entry-manager-'))
 process.env.DSH_SIDEBAR_ENTRIES_FILE = join(dir, 'state.json')
 
 const {

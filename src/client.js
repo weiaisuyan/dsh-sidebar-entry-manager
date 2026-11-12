@@ -1,5 +1,5 @@
 /**
- * dsh-sidebar-entries — browser half (bundle body).
+ * dsh-sidebar-entry-manager — browser half (bundle body).
  *
  * Three jobs:
  *  1. Hide the chosen sidebar entries: the shell (`ui-sidebar`) lists
@@ -30,19 +30,19 @@ const React = require('react')
 const VERSION = '__PLUGIN_VERSION__'
 
 /** Package name used by the update endpoints. */
-const PKG_NAME = 'dsh-sidebar-entries'
+const PKG_NAME = 'dsh-sidebar-entry-manager'
 
 /** Locale namespace / settings section id. */
-const NS = 'sidebar-entries'
+const NS = 'sidebar-entry-manager'
 
 /**
  * Host state route, DOCUMENT-RELATIVE on purpose: the GUI is served with
  * `<base href="./">`, so a root-absolute path escapes a sub-path deployment.
  */
-const API = 'api/dsh-sidebar-entries/state'
+const API = 'api/dsh-sidebar-entry-manager/state'
 
 /** Origin-scoped fallback cache, used only when the Host route is unreachable. */
-const CACHE_KEY = 'dsh-sidebar-entries:state'
+const CACHE_KEY = 'dsh-sidebar-entry-manager:state'
 
 /** Marker attribute on a row this plugin hid (never set on a visible row). */
 const HIDDEN_ATTR = 'data-sidebar-entry-hidden'
@@ -61,7 +61,7 @@ const MARKET = {
 }
 
 /** Fallback version source when the market is absent. */
-const NPM_LATEST_URL = 'https://registry.npmjs.org/dsh-sidebar-entries/latest'
+const NPM_LATEST_URL = 'https://registry.npmjs.org/dsh-sidebar-entry-manager/latest'
 
 const STRINGS = {
   zh: {
@@ -488,12 +488,12 @@ function apply(ctx) {
     }
   }
 
-  ctx.effect(() => ctx.slots.subscribe('sidebar.panellist', refreshEntries), 'dsh-sidebar-entries: panel entries')
+  ctx.effect(() => ctx.slots.subscribe('sidebar.panellist', refreshEntries), 'dsh-sidebar-entry-manager: panel entries')
 
   try {
     const locale = typeof ctx.get === 'function' ? ctx.get('locale', false) : undefined
     if (locale !== undefined && locale !== null && typeof locale.subscribe === 'function') {
-      ctx.effect(() => locale.subscribe(refreshEntries), 'dsh-sidebar-entries: panel labels')
+      ctx.effect(() => locale.subscribe(refreshEntries), 'dsh-sidebar-entry-manager: panel labels')
     }
   } catch {
     // No locale service in this composition: labels stay as first resolved.
@@ -515,7 +515,7 @@ function apply(ctx) {
     return () => {
       observer.disconnect()
     }
-  }, 'dsh-sidebar-entries: sidebar mutations')
+  }, 'dsh-sidebar-entry-manager: sidebar mutations')
 
   // First paint uses whatever we know, then the Host answer replaces it.
   paint()

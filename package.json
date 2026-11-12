@@ -1,5 +1,5 @@
 {
-  "name": "dsh-sidebar-entries",
+  "name": "dsh-sidebar-entry-manager",
   "version": "0.2.0",
   "description": "Manage which plugin entries appear in the DeepSeek Harness left sidebar: hide or show any sidebar panel row without disabling the plugin.",
   "type": "module",
@@ -35,7 +35,7 @@
     "dsh",
     "deepseek",
     "sidebar",
-    "sidebar-entries",
+    "sidebar-entry-manager",
     "ui"
   ],
   "author": {
@@ -44,11 +44,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/weiaisuyan/dsh-sidebar-entries.git"
+    "url": "git+https://github.com/weiaisuyan/dsh-sidebar-entry-manager.git"
   },
-  "homepage": "https://github.com/weiaisuyan/dsh-sidebar-entries#readme",
+  "homepage": "https://github.com/weiaisuyan/dsh-sidebar-entry-manager#readme",
   "bugs": {
-    "url": "https://github.com/weiaisuyan/dsh-sidebar-entries/issues"
+    "url": "https://github.com/weiaisuyan/dsh-sidebar-entry-manager/issues"
   },
   "scripts": {
     "build": "node scripts/build.mjs",
