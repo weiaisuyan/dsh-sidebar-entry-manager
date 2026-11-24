@@ -1,6 +1,6 @@
 {
   "name": "dsh-sidebar-entry-manager",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Manage which plugin entries appear in the DeepSeek Harness left sidebar: hide or show any sidebar panel row without disabling the plugin.",
   "type": "module",
   "main": "lib/index.js",

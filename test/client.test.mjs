@@ -130,7 +130,26 @@ test('the bundle is wrapped in the client loader envelope', async () => {
 
 test('the build baked the package version into the bundle', async () => {
   const source = await readFile(join(root, 'lib', 'client.js'), 'utf8')
-  assert.match(source, /const VERSION = '0\.2\.1'/)
+  assert.match(source, /const VERSION = '0\.2\.2'/)
+})
+
+test('update failures offer only the retries that can work on this host', async () => {
+  const { __test } = await loadClient()
+
+  const desktopFresh = __test.updateFailureHint('RELEASE_TOO_FRESH', 'market text', 'desktop', 'zh')
+  assert.equal(desktopFresh.canUpdate, false, 'the desktop host takes no one-shot bypass')
+  assert.equal(desktopFresh.force, false)
+  assert.match(desktopFresh.text, /发布等待期/)
+
+  const webFresh = __test.updateFailureHint('RELEASE_TOO_FRESH', 'market text', 'web', 'zh')
+  assert.equal(webFresh.canUpdate, true, 'the market-managed host can retry with force')
+  assert.equal(webFresh.force, true)
+
+  const busy = __test.updateFailureHint('OPERATION_BUSY', 'market busy text', 'desktop', 'zh')
+  assert.equal(busy.canUpdate, false)
+  assert.equal(busy.text, 'market busy text', 'the market explains the refused reason')
+
+  assert.equal(__test.updateFailureHint('UPDATE_FAILED', 'boom', 'web', 'zh'), null)
 })
 
 test('resolveLabel handles strings, thunks, locale maps and the fallback', async () => {
