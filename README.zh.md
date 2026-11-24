@@ -40,6 +40,7 @@ DSH 的侧栏外壳只负责把 `sidebar.panellist` 里的注册项画成一行�
 ## 已知边界
 
 - 只管理根作用域的全局面板入口（`sidebar.panellist`）。右侧「侧边卡片」的标签页显隐是 `dsh-better-sidebar` 自己的「侧边卡片」设置页，两边互不覆盖。
+- 侧栏末尾的「更多」按钮不是注册项，但它也会作为一行「「更多」菜单（宿主自带）」出现在设置里，可以单独隐藏；隐藏后插件市场的入口（浏览插件 / 创建插件）也一起收起，需要时再打开。
 - 入口行是外壳画的，没有 id 属性，所以本插件按「声明顺序 + aria-label 校准」把 DOM 行对回注册 id。若某个插件给两行起了同一个名字且顺序也变了，可能认错——此时关掉再打开一次即可复位。
 - 「插件」这一条的 id 是 `plugins`，`dshmarket` 的市场行是 `dsh-market`，两者互不相干。
 - 自动更新依赖插件市场（dshmarket）的公开更新 API；没有市场时只能提示手动更新。
@@ -48,7 +49,7 @@ DSH 的侧栏外壳只负责把 `sidebar.panellist` 里的注册项画成一行�
 
 ```powershell
 # 本地 tarball
-dsh plugin --profile desktop add "<绝对路径>\dsh-sidebar-entry-manager-0.2.0.tgz"
+dsh plugin --profile desktop add "<绝对路径>\dsh-sidebar-entry-manager-0.2.1.tgz"
 ```
 
 也可以在 **插件 → 添加插件** 里填包名（发布到 npm 之后）。

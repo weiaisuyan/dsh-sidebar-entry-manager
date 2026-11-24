@@ -40,6 +40,7 @@ The `plugins` entry (the plugin manager) can be hidden too, but then the sidebar
 ## Known limits
 
 - Governs the root-scope global panel rows (`sidebar.panellist`) only. The right side card's tab visibility is `dsh-better-sidebar`'s own "Side card" settings section; the two never fight.
+- The shell's trailing "More" button is not a registration, but it appears as its own row ("“More” menu (host)") and can be hidden; hiding it also removes the plugin-market entry points inside it until you turn it back on.
 - Rows are drawn by the shell with no id attribute, so this plugin maps DOM rows back to declared ids by index, cross-checked against `aria-label`. If two plugins register the same label *and* the order moves, a row can be mismatched — toggle it off and on again to resettle.
 - The `plugins` entry is `plugins`; `dshmarket`'s market row is `dsh-market`. Independent.
 - Auto-update depends on the plugin market's public update API; without the market only a manual-update hint is shown.
@@ -47,7 +48,7 @@ The `plugins` entry (the plugin manager) can be hidden too, but then the sidebar
 ## Install
 
 ```powershell
-dsh plugin --profile desktop add "<absolute path>\dsh-sidebar-entry-manager-0.2.0.tgz"
+dsh plugin --profile desktop add "<absolute path>\dsh-sidebar-entry-manager-0.2.1.tgz"
 ```
 
 Or paste the package name into **Plugins → Add plugin** once it is on npm.

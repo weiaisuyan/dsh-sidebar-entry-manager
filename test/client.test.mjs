@@ -96,11 +96,28 @@ function makeRow(label) {
 }
 
 /** A fake document that answers the panel-row selector with the given rows. */
-function makeDoc(rows) {
+function makeDoc(rows, options) {
+  const more = options && options.more !== undefined ? options.more : null
+  const nav = more === null ? null : {
+    querySelector(selector) {
+      return selector === 'button[aria-haspopup="menu"]' ? more : null
+    },
+  }
+  const anchorFor = (row) => ({
+    closest(tag) {
+      if (tag === 'button') return row
+      if (tag === 'nav') return nav
+      return null
+    },
+  })
   return {
     querySelectorAll(selector) {
       assert.equal(selector, '[data-slot="sidebar.panellist"]')
-      return rows.map((row) => ({ closest: (tag) => (tag === 'button' ? row : null) }))
+      return rows.map(anchorFor)
+    },
+    querySelector(selector) {
+      assert.equal(selector, '[data-slot="sidebar.panellist"]')
+      return rows.length > 0 ? anchorFor(rows[0]) : null
     },
   }
 }
@@ -113,7 +130,7 @@ test('the bundle is wrapped in the client loader envelope', async () => {
 
 test('the build baked the package version into the bundle', async () => {
   const source = await readFile(join(root, 'lib', 'client.js'), 'utf8')
-  assert.match(source, /const VERSION = '0\.2\.0'/)
+  assert.match(source, /const VERSION = '0\.2\.1'/)
 })
 
 test('resolveLabel handles strings, thunks, locale maps and the fallback', async () => {
@@ -175,6 +192,34 @@ test('a row beyond the declared entries is left alone', async () => {
   assert.equal(__test.applyDom(makeDoc(rows), entries, ['a']), 1)
   assert.equal(rows[0].getAttribute('data-sidebar-entry-hidden'), 'a')
   assert.equal(rows[1].attributes.has('data-sidebar-entry-hidden'), false)
+})
+
+test('the host More launcher maps to the synthetic id and can be hidden', async () => {
+  const { __test } = await loadClient()
+  const entries = [{ id: 'a', order: 1, label: 'A' }]
+  const row = makeRow('A')
+  const more = makeRow('更多')
+  const doc = makeDoc([row], { more })
+
+  assert.equal(__test.applyDom(doc, entries, []), 0)
+  assert.equal(more.style.display, undefined)
+
+  assert.equal(__test.applyDom(doc, entries, ['__more__']), 1)
+  assert.equal(more.style.display, 'none')
+  assert.equal(more.getAttribute('data-sidebar-entry-hidden'), '__more__')
+  assert.equal(more.getAttribute('aria-hidden'), 'true')
+  assert.equal(row.style.display, undefined, 'panel rows stay untouched')
+
+  assert.equal(__test.applyDom(doc, entries, []), 0)
+  assert.equal(more.style.display, '')
+  assert.equal(more.attributes.has('data-sidebar-entry-hidden'), false)
+})
+
+test('hasMoreLauncher only reports a More row when the shell renders one', async () => {
+  const { __test } = await loadClient()
+  assert.equal(__test.hasMoreLauncher(makeDoc([makeRow('A')], { more: makeRow('更多') })), true)
+  assert.equal(__test.hasMoreLauncher(makeDoc([makeRow('A')])), false)
+  assert.equal(__test.hasMoreLauncher(null), false)
 })
 
 test('entries are read from the shell seat and sorted by order', async () => {

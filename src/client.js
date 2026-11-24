@@ -50,6 +50,9 @@ const HIDDEN_ATTR = 'data-sidebar-entry-hidden'
 /** Anchor the slot renderer stamps inside every panel row glyph. */
 const ROW_SELECTOR = '[data-slot="sidebar.panellist"]'
 
+/** Synthetic id for the shell's panel-list "More" launcher (not a slot registration). */
+const MORE_ID = '__more__'
+
 /** Entry id of the plugin manager; flagged in the UI, never blocked. */
 const PROTECTED_ID = 'plugins'
 
@@ -68,7 +71,9 @@ const STRINGS = {
     nav: '侧边栏入口',
     title: '侧边栏入口',
     intro: '勾掉不想在左侧导航栏显示的入口。插件本身继续运行，它的页面和功能都不受影响——只是那一行不再画出来。',
-    count: '已登记 {total} 个入口，当前隐藏 {hidden} 个',
+    count: '共 {total} 项，当前隐藏 {hidden} 项',
+    moreLabel: '「更多」菜单（宿主自带）',
+    moreHint: '宿主画在面板列表末尾的「更多」按钮，插件市场等操作在它里面；隐藏后这些操作只能走其他入口。',
     empty: '当前没有登记到任何侧边栏入口。',
     show: '显示这一行',
     hide: '隐藏这一行',
@@ -101,7 +106,9 @@ const STRINGS = {
     nav: 'Sidebar entries',
     title: 'Sidebar entries',
     intro: 'Turn off the entries you do not want in the left navigation. The plugin keeps running and its page keeps working — only the row stops being drawn.',
-    count: '{total} registered entries, {hidden} hidden',
+    count: '{total} items, {hidden} hidden',
+    moreLabel: '“More” menu (host)',
+    moreHint: 'The host draws this More button at the end of the panel list; the plugin market lives inside it. Hiding it removes that entry point.',
     empty: 'No sidebar entries are registered right now.',
     show: 'Show this row',
     hide: 'Hide this row',
@@ -270,17 +277,33 @@ function readRowLabels(doc) {
     seen.add(button)
     buttons.push(button)
   }
-  return buttons.map((button) => {
+  const rows = buttons.map((button) => {
     const label = button.getAttribute('aria-label')
-    return { button, label: typeof label === 'string' ? label.trim() : '' }
+    return { button, label: typeof label === 'string' ? label.trim() : '', kind: 'panel' }
   })
+  /* The shell's trailing "More" launcher is not a slot registration: it is a
+     plain button with aria-haspopup=menu inside the same nav as the panel rows.
+     Include it so the settings switch can manage that row too. */
+  try {
+    const first = anchors.length > 0 ? anchors[0] : undefined
+    const nav = first !== undefined && typeof first.closest === 'function' ? first.closest('nav') : null
+    if (nav !== null && nav !== undefined && typeof nav.querySelector === 'function') {
+      const more = nav.querySelector('button[aria-haspopup="menu"]')
+      if (more !== null && more !== undefined && !seen.has(more)) {
+        rows.push({ button: more, label: '', kind: 'more' })
+      }
+    }
+  } catch {
+    // Older shell without a nav wrapper: no More row to manage.
+  }
+  return rows
 }
 
 /**
  * Decide, per rendered row, which declared entry it belongs to and whether it
  * must be hidden. Index alignment is authoritative (the shell renders the same
  * entries in the same order); aria-label repairs a row whose index moved and
- * names rows the index cannot.
+ * names rows the index cannot. The trailing More launcher maps to MORE_ID.
  *
  * @param entries - declared entries in shell order.
  * @param rows - rendered rows with their resolved labels.
@@ -291,6 +314,10 @@ function resolveVisibility(entries, rows, hidden) {
   const hiddenSet = new Set(hidden)
   const decisions = []
   rows.forEach((row, index) => {
+    if (row !== null && row !== undefined && row.kind === 'more') {
+      decisions.push({ row: row.button, id: MORE_ID, hide: hiddenSet.has(MORE_ID) })
+      return
+    }
     let id = entries[index] !== undefined ? entries[index].id : undefined
     const label = row.label
     if (label !== '') {
@@ -304,6 +331,22 @@ function resolveVisibility(entries, rows, hidden) {
     decisions.push({ row: row.button, id, hide: hiddenSet.has(id) })
   })
   return decisions
+}
+
+/**
+ * Whether the shell currently renders the panel-list "More" launcher. Used by
+ * the settings list so the synthetic row only appears when it can do anything.
+ */
+function hasMoreLauncher(doc) {
+  try {
+    if (doc === null || doc === undefined || typeof doc.querySelector !== 'function') return false
+    const anchor = doc.querySelector(ROW_SELECTOR)
+    const nav = anchor !== null && anchor !== undefined && typeof anchor.closest === 'function' ? anchor.closest('nav') : null
+    if (nav === null || nav === undefined || typeof nav.querySelector !== 'function') return false
+    return nav.querySelector('button[aria-haspopup="menu"]') !== null
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -607,8 +650,13 @@ function EntrySection(props) {
   const state = props.store.get()
   const notice = props.notices.get()
   const entries = readEntries(props.ctx, lang)
+  /* The shell's trailing More launcher is not a slot entry; expose it as one
+     synthetic row so it can be hidden like any other sidebar entry. */
+  const allEntries = hasMoreLauncher(typeof document !== 'undefined' ? document : null)
+    ? entries.concat([{ id: MORE_ID, label: t('moreLabel'), host: true }])
+    : entries
   const current = state.hidden
-  const hiddenHere = current.filter((id) => entries.some((entry) => entry.id === id)).length
+  const hiddenHere = current.filter((id) => allEntries.some((entry) => entry.id === id)).length
 
   /* ── update state ─────────────────────────────────────────────────────── */
   const [update, setUpdate] = React.useState({
@@ -820,7 +868,7 @@ function EntrySection(props) {
     borderTop: '1px solid var(--dsw-alias-border-l1, rgba(127,127,127,.18))',
   }
 
-  const rows = entries.map((entry, index) => {
+  const rows = allEntries.map((entry, index) => {
     const on = current.indexOf(entry.id) < 0
     return React.createElement(
       'div',
@@ -855,7 +903,23 @@ function EntrySection(props) {
                 },
                 'plugin manager',
               )
-            : null,
+            : entry.host === true
+              ? React.createElement(
+                  'span',
+                  {
+                    style: {
+                      marginLeft: 8,
+                      fontSize: 11,
+                      lineHeight: '16px',
+                      padding: '0 6px',
+                      borderRadius: 999,
+                      border: '1px solid var(--dsw-alias-border-l1, rgba(127,127,127,.3))',
+                      color: 'var(--dsw-alias-label-tertiary, #888)',
+                    },
+                  },
+                  'host',
+                )
+              : null,
         ),
         React.createElement(
           'span',
@@ -868,7 +932,7 @@ function EntrySection(props) {
               fontFamily: 'var(--ds-font-family-code, ui-monospace, monospace)',
             },
           },
-          entry.id,
+          entry.host === true ? t('moreHint') : entry.id,
         ),
       ),
       React.createElement(Switch, {
@@ -883,7 +947,7 @@ function EntrySection(props) {
   })
 
   const empty =
-    entries.length === 0
+    allEntries.length === 0
       ? React.createElement(
           'div',
           { style: { padding: '16px 14px', fontSize: 13, color: 'var(--dsw-alias-label-tertiary, #888)' } },
@@ -1031,7 +1095,7 @@ function EntrySection(props) {
           margin: '0 0 14px',
         },
       },
-      t('count', { total: entries.length, hidden: hiddenHere }),
+      t('count', { total: allEntries.length, hidden: hiddenHere }),
     ),
     React.createElement(
       'div',
@@ -1102,4 +1166,4 @@ function EntrySection(props) {
 
 exports.apply = apply
 exports.inject = inject
-exports.__test = { resolveVisibility, resolveLabel, sanitizeIds, applyDom, readEntries, compareVersion }
+exports.__test = { resolveVisibility, resolveLabel, sanitizeIds, applyDom, readEntries, hasMoreLauncher, compareVersion }
